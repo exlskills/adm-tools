@@ -3,7 +3,11 @@
 
 </head>
 <body>
-<form id="data-form">
+<div>NOTICES: this form is for creating JSON exports for digital diplomas/projects</div>
+<ul>
+    <li>WARN: Since HTML forms convert spaces to plus symbols, if you have '+' in any of your text, it'll end up getting replaced by a space</li>
+</ul>
+<form enctype="text/plain" id="data-form">
     <label for="input-_id">ID</label>
     <input id="input-_id" type="text" name="_id" required>
     <br>
@@ -94,7 +98,7 @@
     function getUrlVars() {
         var vars = {};
         var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-          vars[key] = value;
+          vars[key] = decodeURIComponent(value).replace(/\+/g, ' ');
         });
         return vars;
     }
@@ -216,7 +220,6 @@
     $(function() {
       var uvars = getUrlVars();
       if (uvars && uvars['title']) {
-        console.log(uvars);
         var nPlans = parseInt(uvars['n_plans'] || 0);
         for (var i = 0; i < nPlans; i++) {
           renderPlanInputs(uvars, i);
@@ -226,7 +229,6 @@
         }
         $('#output-code').html(convToJSON(uvars, nPlans));
         $('#output-dl-btn').click(function() {
-          console.log('doing it')
           downloadString(convToJSON(uvars, nPlans), 'application/json', `${uvars['_id']}-mongo-export.json`)
         });
       }
