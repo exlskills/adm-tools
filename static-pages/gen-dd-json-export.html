@@ -61,6 +61,11 @@
     <br>
     <br>
 
+    <label for="input-skill_level">Skill Level (Integer)</label>
+    <input id="input-skill_level" type="number" name="skill_level" required>
+    <br>
+    <br>
+
     <label for="input-description">Description (MD)</label>
     <br>
     <textarea style="width: 100%; height: 250px;" id="input-description" name="description" required></textarea>
@@ -152,13 +157,21 @@
         <br>
         <br>
 
+        <label for="input-plan_${idx}-is_shipping_required">Is Shipping Info Required</label>
+        <select id="input-plan_${idx}-is_shipping_required" name="plan_${idx}-is_shipping_required">
+            <option ${data[`plan_${idx}-is_shipping_required`] === 'false' ? 'selected' : ''} value="false">False</option>
+            <option ${data[`plan_${idx}-is_shipping_required`] === 'true' ? 'selected' : ''} value="true">True</option>
+        </select>
+        <br>
+        <br>
+
         <label for="input-plan_${idx}-opens_at">Plan Opens At (Unix Timestamp in MILLISECONDS!)</label>
-        <input value="" id="input-plan_${idx}-opens_at" type="number" name="plan_${idx}-opens_at" required>
+        <input value="${data[`plan_${idx}-opens_at`] || ""}" id="input-plan_${idx}-opens_at" type="number" name="plan_${idx}-opens_at" required>
         <br>
         <br>
 
         <label for="input-plan_${idx}-closes_at">Plan Closes At (Unix Timestamp in MILLISECONDS!)</label>
-        <input value="" id="input-plan_${idx}-closes_at" type="number" name="plan_${idx}-closes_at" required>
+        <input value="${data[`plan_${idx}-closes_at`] || ""}" id="input-plan_${idx}-closes_at" type="number" name="plan_${idx}-closes_at" required>
         <br>
         <br>
       `);
@@ -173,13 +186,15 @@
       if (!data[`plan_${idx}-_id`]) {
         return undefined
       }
+      var cost = Math.round((parseFloat(`${data[`plan_${idx}-cost`]}`) * 100) / 100);
       return {
         _id: data[`plan_${idx}-_id`],
         title: toIntlStr(data[`plan_${idx}-title`]),
         headline: toIntlStr(data[`plan_${idx}-headline`]),
-        cost: {'$numberInt': `${data[`plan_${idx}-cost`]}`},
+        cost: cost,
         opens_at: {"$date":{"$numberLong": `${data[`plan_${idx}-opens_at`]}`}},
-        closes_at: {"$date":{"$numberLong": `${data[`plan_${idx}-closes_at`]}`}}
+        closes_at: {"$date":{"$numberLong": `${data[`plan_${idx}-closes_at`]}`}},
+        is_shipping_required: data[`plan_${idx}-is_shipping_required`] === 'true'
       }
     }
     function convToJSON(data, nPlans) {
@@ -190,6 +205,10 @@
         title: toIntlStr(data['title']),
         headline: toIntlStr(data['headline']),
         description: toIntlStr(data['description']),
+        cover_url: data[`cover_url`],
+        logo_url: data[`logo_url`],
+        primary_topic: data['primary_topic'],
+        skill_level: parseInt(data['skill_level']),
         topics: csvFmtToArr(data['topics_csv']),
         info_md:  toIntlStr(data['info_md']),
         instructor_timekit: {"intervals":[{"credits":{"$numberInt":"5"},"project_id":data['timekit_30_min_proj_id'],"duration_seconds":{"$numberInt":"1800"}}]},
