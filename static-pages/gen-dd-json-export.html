@@ -103,7 +103,8 @@
     function getUrlVars() {
         var vars = {};
         var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-          vars[key] = decodeURIComponent(value).replace(/\+/g, ' ');
+          // NOTE: decodeURIComponent doesn't work here for whatever reason... However, unescape does...
+          vars[key] = unescape(value).replace(/\+/g, ' ');
         });
         return vars;
     }
